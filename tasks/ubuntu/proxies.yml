@@ -1,0 +1,13 @@
+- name: Create docker directories
+  become: yes
+  file: path="{{item}}" state=directory mode=0755
+  with_items:
+    - /etc/systemd/system/docker.service.d
+
+##### Proxies
+- name: Install proxies
+  become: yes
+  template:
+    src: templates/proxy.conf
+    dest: /etc/systemd/system/docker.service.d
+  

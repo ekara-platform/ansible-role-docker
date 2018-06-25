@@ -1,0 +1,15 @@
+##### Update configuration
+- set_fact:
+    docker_daemon_update: "{{docker_daemon_new_config | mandatory}}"
+
+- name: Create docker directories
+  become: yes
+  file: path="{{item}}" state=directory mode=0755
+  with_items:
+    - /etc/docker
+
+- name: Copy daemon.json to remote directory
+  become: yes
+  copy:
+    content: "{{docker_daemon_update | to_nice_json }}"
+    dest: /etc/docker/daemon.json

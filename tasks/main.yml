@@ -1,0 +1,72 @@
+---
+# tasks file for lagoon.docker
+- name: Install docker/ansible configuration
+  include_tasks: "{{lagoon_machine_version}}"
+  tags: ansible
+  with_first_found:
+    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/docker-ansible.yml"
+    - "{{ ansible_distribution | lower }}/docker-ansible.yml"
+  loop_control:
+    loop_var: lagoon_machine_version
+
+- name: Add docker group
+  include_tasks: "{{lagoon_machine_version}}"
+  tags: ansible
+  with_first_found:
+    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/docker-group.yml"
+    - "{{ ansible_distribution | lower }}/docker-group.yml"
+  loop_control:
+    loop_var: lagoon_machine_version
+
+- name: Install docker
+  include_tasks: "{{lagoon_machine_version}}"
+  tags: ansible
+  with_first_found:
+    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/install.yml"
+    - "{{ ansible_distribution | lower }}/install.yml"
+  loop_control:
+    loop_var: lagoon_machine_version
+
+- name: Add TLS for docker
+  include_tasks: "{{lagoon_machine_version}}"
+  tags: ansible
+  with_first_found:
+    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/config-tls.yml"
+    - "{{ ansible_distribution | lower }}/config-tls.yml"
+  loop_control:
+    loop_var: lagoon_machine_version
+  when: lagoon_configuration_params.docker.tls is defined
+
+- name: Add Proxies for docker
+  include_tasks: "{{lagoon_machine_version}}"
+  tags: ansible
+  with_first_found:
+    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/proxies.yml"
+    - "{{ ansible_distribution | lower }}/proxies.yml"
+  loop_control:
+    loop_var: lagoon_machine_version
+  when: lagoon_configuration_params.proxy is defined
+
+- name: Add Usernamespace for docker
+  include_tasks: "{{lagoon_machine_version}}"
+  tags: ansible
+  with_first_found:
+    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/config-user-ns.yml"
+    - "{{ ansible_distribution | lower }}/config-user-ns.yml"
+  loop_control:
+    loop_var: lagoon_machine_version
+  when: lagoon_configuration_params.docker['userns-remap'] is defined
+
+- name: Update configuration
+  include_tasks: update-json.yml docker_daemon_new_config="{{lagoon_configuration_params.docker}}" 
+
+- name: Start docker
+  include_tasks: "{{lagoon_machine_version}}"
+  tags: ansible
+  with_first_found:
+    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/daemon-start.yml"
+    - "{{ ansible_distribution | lower }}/daemon-start.yml"
+  loop_control:
+    loop_var: lagoon_machine_version
+
+

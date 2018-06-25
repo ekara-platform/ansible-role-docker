@@ -1,0 +1,15 @@
+- name: Add docker group list
+  become: yes
+  group: name=docker state=present
+
+- name: Update group list
+  become: yes
+  user: name=ubuntu append=yes groups=docker
+  register: docker_group
+
+- name: Kill SSH
+  shell: sleep 1; pkill -u {{ ansible_user_id }} sshd
+  async: 3
+  poll: 2
+  when: docker_group.changed
+  
