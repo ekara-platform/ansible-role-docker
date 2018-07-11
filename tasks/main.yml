@@ -58,7 +58,7 @@
   when: lagoon_configuration_params.orchestrator.docker['userns-remap'] is defined
 
 - name: Update configuration
-  include_tasks: update-json.yml docker_daemon_new_config="{{lagoon_configuration_params.orchestrator.docker}}" 
+  include_tasks: update-json.yml docker_daemon_new_config="{{lagoon_configuration_params.orchestrator.docker}}"
 
 - name: Start docker
   include_tasks: "{{lagoon_machine_version}}"

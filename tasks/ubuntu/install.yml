@@ -1,5 +1,5 @@
 ---
-- name: Get Docker's official GPG key
+- name: Get Docker official GPG key
   become: true
   apt_key:
     url: "https://download.docker.com/linux/ubuntu/gpg"
