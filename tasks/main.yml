@@ -4,8 +4,8 @@
   include_tasks: "{{lagoon_machine_version}}"
   tags: ansible
   with_first_found:
-    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/docker-ansible.yml"
-    - "{{ ansible_distribution | lower }}/docker-ansible.yml"
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/docker-ansible.yml"
+  - "{{ ansible_distribution | lower }}/docker-ansible.yml"
   loop_control:
     loop_var: lagoon_machine_version
 
@@ -13,8 +13,8 @@
   include_tasks: "{{lagoon_machine_version}}"
   tags: ansible
   with_first_found:
-    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/docker-group.yml"
-    - "{{ ansible_distribution | lower }}/docker-group.yml"
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/docker-group.yml"
+  - "{{ ansible_distribution | lower }}/docker-group.yml"
   loop_control:
     loop_var: lagoon_machine_version
 
@@ -22,8 +22,8 @@
   include_tasks: "{{lagoon_machine_version}}"
   tags: ansible
   with_first_found:
-    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/install.yml"
-    - "{{ ansible_distribution | lower }}/install.yml"
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/install.yml"
+  - "{{ ansible_distribution | lower }}/install.yml"
   loop_control:
     loop_var: lagoon_machine_version
 
@@ -31,8 +31,8 @@
   include_tasks: "{{lagoon_machine_version}}"
   tags: ansible
   with_first_found:
-    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/config-tls.yml"
-    - "{{ ansible_distribution | lower }}/config-tls.yml"
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/config-tls.yml"
+  - "{{ ansible_distribution | lower }}/config-tls.yml"
   loop_control:
     loop_var: lagoon_machine_version
   when: lagoon_configuration_params.orchestrator.docker.tls is defined
@@ -41,8 +41,8 @@
   include_tasks: "{{lagoon_machine_version}}"
   tags: ansible
   with_first_found:
-    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/proxies.yml"
-    - "{{ ansible_distribution | lower }}/proxies.yml"
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/proxies.yml"
+  - "{{ ansible_distribution | lower }}/proxies.yml"
   loop_control:
     loop_var: lagoon_machine_version
   when: lagoon_configuration_params.proxy is defined
@@ -51,8 +51,8 @@
   include_tasks: "{{lagoon_machine_version}}"
   tags: ansible
   with_first_found:
-    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/config-user-ns.yml"
-    - "{{ ansible_distribution | lower }}/config-user-ns.yml"
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/config-user-ns.yml"
+  - "{{ ansible_distribution | lower }}/config-user-ns.yml"
   loop_control:
     loop_var: lagoon_machine_version
   when: lagoon_configuration_params.orchestrator.docker['userns-remap'] is defined
@@ -64,9 +64,7 @@
   include_tasks: "{{lagoon_machine_version}}"
   tags: ansible
   with_first_found:
-    - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/daemon-start.yml"
-    - "{{ ansible_distribution | lower }}/daemon-start.yml"
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/daemon-start.yml"
+  - "{{ ansible_distribution | lower }}/daemon-start.yml"
   loop_control:
     loop_var: lagoon_machine_version
-
-

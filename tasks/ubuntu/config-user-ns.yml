@@ -1,21 +1,21 @@
+---
 - name: Add dockremap group
-  become: yes
-  group: 
-    name: dockremap 
+  become: true
+  group:
+    name: dockremap
     state: present
 - name: Create new user to remap root
-  become: yes
+  become: true
   user:
     name: dockremap
     comment: "User to remap docker"
     group: dockremap
     shell: /bin/false
 - name: Copy configuration for docker remap
-  become: yes
+  become: true
   copy:
     src: "{{item}}"
     dest: /etc/
   with_items:
   - files/namespace/subgid
   - files/namespace/subuid
-

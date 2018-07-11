@@ -1,40 +1,37 @@
 ---
 # tasks file for docker/ansible link
 - name: Install docker/ansible dependencies
-  become: yes
+  become: true
   apt:
-      name={{ item }}
-      state=present
-      update_cache=yes
+    name={{ item }}
+    state=present
+    update_cache=yes
   with_items:
-      - python-dev
-      - python-pip
+  - python-dev
+  - python-pip
 
 - name: Upgrade pip
-  become: yes
-  pip: 
+  become: true
+  pip:
     name=pip
     extra_args=--upgrade
-    
+
 - name: Remove old Python modules
-  become: yes
+  become: true
   pip:
-      name={{ item }}
-      state=absent
+    name={{ item }}
+    state=absent
   with_items:
-      - docker-py
+  - docker-py
 
 - name: Install Python modules
-  become: yes
+  become: true
   pip:
-      name=docker
-      state=present
-#      version=2.7.0
+    name=docker
+    state=present
 
 - name: Install docker-compose
-  become: yes
+  become: true
   pip:
-      name=docker-compose
-      state=present
-#      version=1.19.0
-      
+    name=docker-compose
+    state=present
