@@ -71,7 +71,7 @@
       extendedKeyUsage = clientAuth,serverAuth
       subjectAltName = DNS:localhost,IP:{{lagoon_provider_map.private_ip}},IP:127.0.0.1,IP:{{lagoon_provider_map.public_ip}}
     dest: "{{remote_ca_path}}/server-extfile.cnf"
-    force: no
+    force: false
 - name: Create Server certificate
   become: true
   command: >
