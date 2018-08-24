@@ -1,7 +1,7 @@
 ---
 - set_fact:
-    ca_cn: "{{lagoon_configuration_params.client.name}}_{{lagoon_configuration_params.client.uid}}"
-    remote_ca_path: "{{ lagoon_configuration_params.orchestrator.docker.tlscacert | dirname }}"
+    ca_cn: "{{lagoon_docker_ca_cn}}"
+    remote_ca_path: "{{ lagoon_docker_params.tlscacert | dirname }}"
     local_ca_path: "{{output_dir}}/certs"
 
 - name: Create ssl directory
@@ -24,10 +24,10 @@
   command: >
     openssl req -new -x509 -days 3650
       -key "{{local_ca_path}}/ca-priv-key.pem"
-      -out "{{local_ca_path}}/{{ lagoon_configuration_params.orchestrator.docker.tlscacert | basename }}"
+      -out "{{local_ca_path}}/{{ lagoon_docker_params.tlscacert | basename }}"
       -subj "/CN={{ca_cn}}/C=FR"
   args:
-    creates: "{{local_ca_path}}/{{ lagoon_configuration_params.orchestrator.docker.tlscacert | basename }}"
+    creates: "{{local_ca_path}}/{{ lagoon_docker_params.tlscacert | basename }}"
 
 - name: Create ssl directory
   become: true
@@ -45,45 +45,56 @@
     src: "{{local_ca_path}}/{{item}}"
     dest: "{{remote_ca_path}}/{{item}}"
   with_items:
-  - "{{ lagoon_configuration_params.orchestrator.docker.tlscacert | basename }}"
+  - "{{ lagoon_docker_params.tlscacert | basename }}"
   - "ca-priv-key.pem"
 
 - name: Create server key
   become: true
   command: >
     openssl genrsa
-      -out "{{remote_ca_path}}/{{ lagoon_configuration_params.orchestrator.docker.tlskey | basename }}"
+      -out "{{remote_ca_path}}/{{ lagoon_docker_params.tlskey | basename }}"
       4096
   args:
-    creates: "{{remote_ca_path}}/{{ lagoon_configuration_params.orchestrator.docker.tlskey | basename }}"
+    creates: "{{remote_ca_path}}/{{ lagoon_docker_params.tlskey | basename }}"
 - name: Create Server csr
   become: true
   command: >
     openssl req -subj "/CN={{ca_cn}}" -new
-      -key "{{remote_ca_path}}/{{ lagoon_configuration_params.orchestrator.docker.tlskey | basename }}"
+      -key "{{remote_ca_path}}/{{ lagoon_docker_params.tlskey | basename }}"
       -out "{{remote_ca_path}}/server.csr"
   args:
     creates: "{{remote_ca_path}}/server.csr"
-- name: Create server cnf file
+- debug: var=lagoon_docker_provider
+- name: Create server cnf file with private IP
   become: true
   copy:
     content: |
       extendedKeyUsage = clientAuth,serverAuth
-      subjectAltName = DNS:localhost,IP:{{lagoon_provider_map.private_ip}},IP:127.0.0.1,IP:{{lagoon_provider_map.public_ip}}
+      subjectAltName = DNS:localhost,IP:{{lagoon_docker_provider.private_ip}},IP:127.0.0.1
+    dest: "{{remote_ca_path}}/server-extfile.cnf"
+    force: true
+  when: lagoon_docker_provider.public_ip == ""
+- name: Create server cnf file with private/public IP
+  become: false
+  copy:
+    content: |
+      extendedKeyUsage = clientAuth,serverAuth
+      subjectAltName = DNS:localhost,IP:{{lagoon_docker_provider.private_ip}},IP:127.0.0.1,IP:{{lagoon_docker_provider.public_ip}}
     dest: "{{remote_ca_path}}/server-extfile.cnf"
     force: false
+  when: lagoon_docker_provider.public_ip != ""
 - name: Create Server certificate
   become: true
   command: >
     openssl x509 -req -days 3650
       -in "{{remote_ca_path}}/server.csr"
-      -CA "{{remote_ca_path}}/{{ lagoon_configuration_params.orchestrator.docker.tlscacert | basename }}"
+      -CA "{{remote_ca_path}}/{{ lagoon_docker_params.tlscacert | basename }}"
       -CAkey "{{remote_ca_path}}/ca-priv-key.pem"
       -CAcreateserial
-      -out "{{remote_ca_path}}/{{ lagoon_configuration_params.orchestrator.docker.tlscert | basename }}"
+      -out "{{remote_ca_path}}/{{ lagoon_docker_params.tlscert | basename }}"
       -extfile "{{remote_ca_path}}/server-extfile.cnf"
   args:
-    creates: "{{remote_ca_path}}/{{ lagoon_configuration_params.orchestrator.docker.tlscert | basename }}"
+    creates: "{{remote_ca_path}}/{{ lagoon_docker_params.tlscert | basename }}"
 
 - name: Find certificates files
   become: true
