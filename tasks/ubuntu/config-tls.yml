@@ -65,12 +65,14 @@
   args:
     creates: "{{remote_ca_path}}/server.csr"
 - debug: var=lagoon_docker_provider
+- set_fact:
+    lagoon_docker_altname: DNS:localhost,IP:127.0.0.1
 - name: Create server cnf file with private IP
   become: true
   copy:
     content: |
       extendedKeyUsage = clientAuth,serverAuth
-      subjectAltName = DNS:localhost,IP:{{lagoon_docker_provider.private_ip}},IP:127.0.0.1
+      subjectAltName = {{lagoon_docker_altname}},IP:{{lagoon_docker_provider.private_ip}}
     dest: "{{remote_ca_path}}/server-extfile.cnf"
     force: true
   when: lagoon_docker_provider.public_ip == ""
@@ -79,7 +81,7 @@
   copy:
     content: |
       extendedKeyUsage = clientAuth,serverAuth
-      subjectAltName = DNS:localhost,IP:{{lagoon_docker_provider.private_ip}},IP:127.0.0.1,IP:{{lagoon_docker_provider.public_ip}}
+      subjectAltName = {{lagoon_docker_altname}},IP:{{lagoon_docker_provider.private_ip}},IP:{{lagoon_docker_provider.public_ip}}
     dest: "{{remote_ca_path}}/server-extfile.cnf"
     force: false
   when: lagoon_docker_provider.public_ip != ""
