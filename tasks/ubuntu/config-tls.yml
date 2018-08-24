@@ -64,7 +64,7 @@
       -out "{{remote_ca_path}}/server.csr"
   args:
     creates: "{{remote_ca_path}}/server.csr"
-- debug: var=lagoon_docker_provider
+
 - set_fact:
     lagoon_docker_altname: DNS:localhost,IP:127.0.0.1
 - name: Create server cnf file with private IP
