@@ -55,7 +55,16 @@
   - "{{ ansible_distribution | lower }}/config-user-ns.yml"
   loop_control:
     loop_var: lagoon_machine_version
-  when: lagoon_docker_params['userns-remap'] is defined
+  when: lagoon_docker_certs.registries is defined
+
+- name: Add private registry for docker
+  include_tasks: certificates.yml
+  tags: ansible
+  loop_control:
+    loop_var: lagoon_registry_cert
+  with_dict:
+  - "{{lagoon_docker_certs.registries}}"
+  when: lagoon_docker_certs.registries is defined
 
 - name: Update configuration
   include_tasks: update-json.yml docker_daemon_new_config="{{lagoon_docker_params}}"
