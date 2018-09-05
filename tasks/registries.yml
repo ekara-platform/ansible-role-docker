@@ -2,14 +2,14 @@
 # Install registries certificates
 
 - name: Create certificates folders
-  become: yes
-  file: 
+  become: true
+  file:
     path: "/etc/docker/certs.d/{{lagoon_registry.key}}"
     state: directory
     mode: 0755
-  
+
 - name: Install certificates
-  become: yes
+  become: true
   get_url:
     url: "{{lagoon_registry.value.certificate}}"
     dest: "/etc/docker/certs.d/{{lagoon_registry.key}}"
