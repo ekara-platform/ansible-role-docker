@@ -5,4 +5,4 @@ lagoon_docker_proxy:
 lagoon_docker_params:
 lagoon_docker_ca_cn: docker
 lagoon_provider_map:
-lagoon_docker_registries:
+lagoon_docker_all:

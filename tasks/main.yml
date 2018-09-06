@@ -45,7 +45,7 @@
   - "{{ ansible_distribution | lower }}/proxies.yml"
   loop_control:
     loop_var: lagoon_machine_version
-  when: lagoon_docker_proxy is defined
+  when: lagoon_docker_proxy.http_proxy is defined
 
 - name: Add Usernamespace for docker
   include_tasks: "{{lagoon_machine_version}}"
@@ -63,8 +63,8 @@
   loop_control:
     loop_var: lagoon_registry
   with_dict:
-  - "{{lagoon_docker_registries}}"
-  when: lagoon_docker_registries is defined
+  - "{{lagoon_docker_all['registries']}}"
+  when: lagoon_docker_all['registries'] is defined
 
 - name: Update configuration
   include_tasks: update-json.yml docker_daemon_new_config="{{lagoon_docker_params}}"
