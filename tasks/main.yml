@@ -35,7 +35,7 @@
   - "{{ ansible_distribution | lower }}/config-tls.yml"
   loop_control:
     loop_var: lagoon_machine_version
-  when: lagoon_configuration_params.orchestrator.docker.tls is defined
+  when: lagoon_docker_params.tls is defined
 
 - name: Add Proxies for docker
   include_tasks: "{{lagoon_machine_version}}"
@@ -45,7 +45,7 @@
   - "{{ ansible_distribution | lower }}/proxies.yml"
   loop_control:
     loop_var: lagoon_machine_version
-  when: lagoon_configuration_params.proxy is defined
+  when: lagoon_docker_proxy.http_proxy is defined
 
 - name: Add Usernamespace for docker
   include_tasks: "{{lagoon_machine_version}}"
@@ -55,10 +55,19 @@
   - "{{ ansible_distribution | lower }}/config-user-ns.yml"
   loop_control:
     loop_var: lagoon_machine_version
-  when: lagoon_configuration_params.orchestrator.docker['userns-remap'] is defined
+  when: lagoon_docker_params['userns-remap'] is defined
+
+- name: Add private registry for docker
+  include_tasks: registries.yml
+  tags: ansible
+  loop_control:
+    loop_var: lagoon_registry
+  with_dict:
+  - "{{lagoon_docker_all['registries']}}"
+  when: lagoon_docker_all['registries'] is defined
 
 - name: Update configuration
-  include_tasks: update-json.yml docker_daemon_new_config="{{lagoon_configuration_params.orchestrator.docker}}"
+  include_tasks: update-json.yml docker_daemon_new_config="{{lagoon_docker_params}}"
 
 - name: Start docker
   include_tasks: "{{lagoon_machine_version}}"
