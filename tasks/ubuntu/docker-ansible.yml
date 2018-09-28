@@ -37,5 +37,8 @@
   become: true
   environment: "{{lagoon_docker_proxy}}"
   pip:
-    name=docker-compose
+    name={{item}}
     state=present
+  with_items:
+  - docker-compose
+  - jsondiff
