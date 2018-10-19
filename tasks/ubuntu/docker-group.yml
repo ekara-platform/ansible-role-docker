@@ -1,4 +1,32 @@
 ---
+- lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: '^group:(.*ldap.*)'
+    line: '##LAGOON group:\1'
+    backrefs: yes  
+  check_mode: yes
+  register: lagoon_ldap_group
+
+- block:
+  - name: Remove ldap group
+    become: yes
+    replace:
+      name: /etc/nsswitch.conf
+      regexp: '^group:(.*)'
+      replace: '##LAGOON group:\1'
+  - name: Force local group configuration
+    become: yes
+    lineinfile:
+      path: /etc/nsswitch.conf
+      line: "group: files"
+  - name: Restart nscd service
+    become: yes
+    service:
+      name: nscd
+      state: restarted
+  when:
+  - lagoon_ldap_group.changed
+
 - name: Add docker group list
   become: true
   group: name=docker state=present
@@ -7,6 +35,27 @@
   become: true
   user: name=ubuntu append=yes groups=docker
   register: docker_group
+
+- block:
+  - name: Add ldap group
+    become: yes
+    replace:
+      name: /etc/nsswitch.conf
+      regexp: '^##LAGOON group:(.*)'
+      replace: 'group:\1' 
+  - name: Remove local group configuration
+    become: yes
+    lineinfile:
+      path: /etc/nsswitch.conf
+      line: "group: files"
+      state: absent
+  - name: Restart nscd service
+    become: yes
+    service:
+      name: nscd
+      state: restarted
+  when:
+  - lagoon_ldap_group.changed
 
 - name: Kill SSH
   shell: sleep 1; pkill -u {{ ansible_user_id }} sshd
