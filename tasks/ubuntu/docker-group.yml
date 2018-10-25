@@ -3,24 +3,24 @@
     path: /etc/nsswitch.conf
     regexp: '^group:(.*ldap.*)'
     line: '##LAGOON group:\1'
-    backrefs: yes  
-  check_mode: yes
+    backrefs: true
+  check_mode: true
   register: lagoon_ldap_group
 
 - block:
   - name: Remove ldap group
-    become: yes
+    become: true
     replace:
       name: /etc/nsswitch.conf
       regexp: '^group:(.*)'
       replace: '##LAGOON group:\1'
   - name: Force local group configuration
-    become: yes
+    become: true
     lineinfile:
       path: /etc/nsswitch.conf
       line: "group: files"
   - name: Restart nscd service
-    become: yes
+    become: true
     service:
       name: nscd
       state: restarted
@@ -38,19 +38,19 @@
 
 - block:
   - name: Add ldap group
-    become: yes
+    become: true
     replace:
       name: /etc/nsswitch.conf
       regexp: '^##LAGOON group:(.*)'
-      replace: 'group:\1' 
+      replace: 'group:\1'
   - name: Remove local group configuration
-    become: yes
+    become: true
     lineinfile:
       path: /etc/nsswitch.conf
       line: "group: files"
       state: absent
   - name: Restart nscd service
-    become: yes
+    become: true
     service:
       name: nscd
       state: restarted
