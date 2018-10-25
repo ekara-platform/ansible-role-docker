@@ -1,8 +1,8 @@
 ---
-# defaults file for lagoon.docker
+# defaults file for ekara.docker
 output_dir: /opt/output
-lagoon_docker_proxy:
-lagoon_docker_params:
-lagoon_docker_ca_cn: docker
-lagoon_provider_map:
-lagoon_docker_all:
+ekara_docker_proxy:
+ekara_docker_params:
+ekara_docker_ca_cn: docker
+ekara_provider_map:
+ekara_docker_all:
