@@ -6,7 +6,7 @@
   - /etc/systemd/system/docker.service.d
 
 - set_fact:
-    lagoon_docker_no_proxy: "{{lagoon_docker_proxy.no_proxy | replace('[NODES_IPS]',lagoon_docker_nodes_ip)}}"
+    ekara_docker_no_proxy: "{{ekara_docker_proxy.no_proxy | replace('[NODES_IPS]',ekara_docker_nodes_ip)}}"
 
 - name: Install proxies
   become: true

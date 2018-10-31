@@ -2,7 +2,7 @@
 # tasks file for docker/ansible link
 - name: Install docker/ansible dependencies
   become: true
-  environment: "{{lagoon_docker_proxy}}"
+  environment: "{{ekara_docker_proxy}}"
   apt:
     name={{ item }}
     state=present
@@ -13,7 +13,7 @@
 
 - name: Upgrade pip
   become: true
-  environment: "{{lagoon_docker_proxy}}"
+  environment: "{{ekara_docker_proxy}}"
   pip:
     name=pip
     extra_args=--upgrade
@@ -28,14 +28,14 @@
 
 - name: Install Python modules
   become: true
-  environment: "{{lagoon_docker_proxy}}"
+  environment: "{{ekara_docker_proxy}}"
   pip:
     name=docker
     state=present
 
 - name: Install docker-compose
   become: true
-  environment: "{{lagoon_docker_proxy}}"
+  environment: "{{ekara_docker_proxy}}"
   pip:
     name={{item}}
     state=present

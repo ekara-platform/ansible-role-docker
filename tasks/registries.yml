@@ -4,19 +4,19 @@
 - name: Create certificates folders
   become: true
   file:
-    path: "/etc/docker/certs.d/{{lagoon_registry.key}}"
+    path: "/etc/docker/certs.d/{{ekara_registry.key}}"
     state: directory
     mode: 0755
 
 - name: Install certificates
   become: true
   get_url:
-    url: "{{lagoon_registry.value.certificate}}"
-    dest: "/etc/docker/certs.d/{{lagoon_registry.key}}"
+    url: "{{ekara_registry.value.certificate}}"
+    dest: "/etc/docker/certs.d/{{ekara_registry.key}}"
     mode: 0400
 
 - name: Log into private registry
   docker_login:
-    registry: "{{lagoon_registry.key}}"
-    username: "{{lagoon_registry.value.username}}"
-    password: "{{lagoon_registry.value.password}}"
+    registry: "{{ekara_registry.key}}"
+    username: "{{ekara_registry.value.username}}"
+    password: "{{ekara_registry.value.password}}"
