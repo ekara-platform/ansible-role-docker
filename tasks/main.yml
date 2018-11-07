@@ -67,7 +67,9 @@
   when: ekara_docker_all['registries'] is defined
 
 - name: Update configuration
-  include_tasks: update-json.yml docker_daemon_new_config="{{ekara_docker_params}}"
+  include_tasks: update-json.yml
+  vars:
+    docker_daemon_new_config: "{{ekara_docker_params}}"
 
 - name: Start docker
   include_tasks: "{{ekara_machine_version}}"

@@ -4,12 +4,11 @@
   become: true
   environment: "{{ekara_docker_proxy}}"
   apt:
-    name={{ item }}
-    state=present
-    update_cache=yes
-  with_items:
-  - python-dev
-  - python-pip
+    name:
+    - python-dev
+    - python-pip
+    state: present
+    update_cache: yes
 
 - name: Upgrade pip
   become: true
@@ -21,24 +20,23 @@
 - name: Remove old Python modules
   become: true
   pip:
-    name={{ item }}
-    state=absent
-  with_items:
-  - docker-py
+    name:
+    - docker-py
+    state: absent
 
 - name: Install Python modules
   become: true
   environment: "{{ekara_docker_proxy}}"
   pip:
-    name=docker
-    state=present
+    name:
+    - docker
+    state: present
 
 - name: Install docker-compose
   become: true
   environment: "{{ekara_docker_proxy}}"
   pip:
-    name={{item}}
-    state=present
-  with_items:
-  - docker-compose
-  - jsondiff
+    name:
+    - docker-compose
+    - jsondiff
+    state: present
