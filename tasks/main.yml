@@ -62,7 +62,7 @@
   tags: ansible
   loop_control:
     loop_var: ekara_registry
-  loop: "{{ekara_docker_all.registries|dict2items}}"
+  loop: "{{(ekara_docker_all.registries|default({}))|dict2items}}"
   when: ekara_docker_all.registries is defined
 
 - name: Update configuration
