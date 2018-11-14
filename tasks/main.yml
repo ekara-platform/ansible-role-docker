@@ -62,9 +62,8 @@
   tags: ansible
   loop_control:
     loop_var: ekara_registry
-  with_dict:
-  - "{{ekara_docker_all['registries']}}"
-  when: ekara_docker_all['registries'] is defined
+  loop: "{{ekara_docker_all.registries|dict2items}}"
+  when: ekara_docker_all.registries is defined
 
 - name: Update configuration
   include_tasks: update-json.yml

@@ -1,7 +1,7 @@
 ---
 # Install registries certificates
 
-- name: Create certificates folders
+- name: "Create certificates folders for {{ekara_registry.key}}"
   become: true
   file:
     path: "/etc/docker/certs.d/{{ekara_registry.key}}"
