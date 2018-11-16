@@ -6,3 +6,4 @@ ekara_docker_params:
 ekara_docker_ca_cn: docker
 ekara_provider_map:
 ekara_docker_all:
+ekara_docker_default_version: 18.06

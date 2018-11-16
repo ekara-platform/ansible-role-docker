@@ -11,11 +11,44 @@
   apt_repository:
     repo: "deb https://download.docker.com/linux/ubuntu {{ansible_lsb.codename}} stable"
     state: present
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  become: true
+  apt:
+    update_cache: true
+  environment: "{{ekara_docker_proxy}}"
+- name: Check docker version
+  set_fact:
+    ekara_docker_default_version: "{{ekara_docker_all.version}}"
+  when:
+  - ekara_docker_all.version is defined
+- block:
+  - name: Get list
+    become: true
+    shell: apt-cache madison docker-ce | grep "{{ekara_docker_default_version}}"
+    register: ekara_docker_versions
+  - set_fact: 
+      ekara_docker_version_fix: "{{ekara_docker_version_fix|default([]) + [(item.split('|')[1]|trim)]}}"
+    loop: "{{ekara_docker_versions.stdout_lines}}"
+    loop_control:
+      label: "{{item.split('|')[1]|trim}}"
+  - name: Docker version to install
+    debug: var=ekara_docker_version_fix[0]
+- name: Authorize packages from being upgraded
+  become: true
+  dpkg_selections:
+    name: docker-ce
+    selection: install
 - name: Install docker packages
   become: true
   environment: "{{ekara_docker_proxy}}"
   apt:
     name:
-    - docker-ce=18.06.1~ce~3-0~ubuntu
+    - "docker-ce={{ekara_docker_version_fix[0]}}"
     state: present
-    update_cache: yes
+
+- name: Prevent packages from being upgraded
+  become: true
+  dpkg_selections:
+    name: docker-ce
+    selection: hold
