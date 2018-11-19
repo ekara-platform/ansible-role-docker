@@ -27,7 +27,7 @@
     become: true
     shell: apt-cache madison docker-ce | grep "{{ekara_docker_default_version}}"
     register: ekara_docker_versions
-  - set_fact: 
+  - set_fact:
       ekara_docker_version_fix: "{{ekara_docker_version_fix|default([]) + [(item.split('|')[1]|trim)]}}"
     loop: "{{ekara_docker_versions.stdout_lines}}"
     loop_control:
