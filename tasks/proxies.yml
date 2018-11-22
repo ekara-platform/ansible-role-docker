@@ -1,0 +1,10 @@
+---
+- name: Add Proxies for docker
+  include_tasks: "{{ekara_machine_version}}"
+  tags: ansible
+  with_first_found:
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/proxies.yml"
+  - "{{ ansible_distribution | lower }}/proxies.yml"
+  loop_control:
+    loop_var: ekara_machine_version
+  when: ekara_docker_proxy.http_proxy is defined

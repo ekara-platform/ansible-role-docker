@@ -38,13 +38,8 @@
   when: ekara_docker_params.tls is defined
 
 - name: Add Proxies for docker
-  include_tasks: "{{ekara_machine_version}}"
+  include_tasks: proxies.yml
   tags: ansible
-  with_first_found:
-  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/proxies.yml"
-  - "{{ ansible_distribution | lower }}/proxies.yml"
-  loop_control:
-    loop_var: ekara_machine_version
   when: ekara_docker_proxy.http_proxy is defined
 
 - name: Add Usernamespace for docker
@@ -62,9 +57,8 @@
   tags: ansible
   loop_control:
     loop_var: ekara_registry
-  with_dict:
-  - "{{ekara_docker_all['registries']}}"
-  when: ekara_docker_all['registries'] is defined
+  loop: "{{(ekara_docker_all.registries|default({}))|dict2items}}"
+  when: ekara_docker_all.registries is defined
 
 - name: Update configuration
   include_tasks: update-json.yml
@@ -72,10 +66,5 @@
     docker_daemon_new_config: "{{ekara_docker_params}}"
 
 - name: Start docker
-  include_tasks: "{{ekara_machine_version}}"
+  include_tasks: start.yml
   tags: ansible
-  with_first_found:
-  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/daemon-start.yml"
-  - "{{ ansible_distribution | lower }}/daemon-start.yml"
-  loop_control:
-    loop_var: ekara_machine_version

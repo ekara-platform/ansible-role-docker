@@ -9,6 +9,16 @@
   with_items:
   - /etc/docker
 
+- set_fact:
+    docker_labels: "{{ (docker_labels|default([])) + [item.key+'='+item.value] }}"
+  loop: "{{ekara_labels | dict2items}}"
+
+- name: Add labels
+  set_fact:
+    docker_daemon_update: "{{ docker_daemon_update | combine({'labels': docker_labels}) }}"
+  when:
+  - docker_labels is defined
+
 - name: Copy daemon.json to remote directory
   become: true
   copy:
