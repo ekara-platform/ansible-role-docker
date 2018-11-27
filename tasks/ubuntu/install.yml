@@ -23,6 +23,8 @@
   when:
   - ekara_docker_all.version is defined
 - block:
+  - name: Default Docker version to install
+    debug: var=ekara_docker_default_version
   - name: Get list
     become: true
     shell: apt-cache madison docker-ce | grep "{{ekara_docker_default_version}}"
