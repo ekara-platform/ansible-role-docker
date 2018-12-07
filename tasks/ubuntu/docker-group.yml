@@ -8,6 +8,16 @@
   register: ekara_ldap_group
 
 - block:
+  - name: Check if docker group exists in LDAP
+    getent:
+      database: group
+      key: docker
+      split: ':'
+      fail_key: no
+  - set_fact:
+      ekara_docker_group: "{{getent_group.docker[1]}}"
+    when:
+    - getent_group.docker != None
   - name: Remove ldap group
     become: true
     replace:
@@ -30,6 +40,14 @@
 - name: Add docker group list
   become: true
   group: name=docker state=present
+  when:
+  - ekara_docker_group is not defined
+
+- name: Add docker group list with fixed gid
+  become: true
+  group: name=docker state=present gid={{ekara_docker_group|int}}
+  when:
+  - ekara_docker_group is defined
 
 - name: Update group list
   become: true
