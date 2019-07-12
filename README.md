@@ -14,7 +14,6 @@ Role Variables
 - **ekara_docker_proxy**: proxy information (http\_proxy, https\_proxy, no\_proxy). Example: http_proxy: http://user:password@myproxy.com:80
 - **ekara_docker_params**: All docker paramaters. See: https://docs.docker.com/engine/reference/commandline/dockerd/#daemon-configuration-file 
 - **ekara_docker_ca_cn**: CN used to create a CA.
-- **ekara_docker_provider**: Map which contains private\_ip and public\_ip for the dockerhost. (See *ekara_provider_map*)
 
 Dependencies
 ------------
@@ -38,7 +37,6 @@ Including an example of how to use your role (for instance, with variables passe
 				  max-size: "20m"
 				  max-file: "3"
 			ekara_docker_ca_cn: "docker_host"
-			ekara_docker_provider: "{{ekara_provider_map}}"
 
 License
 -------

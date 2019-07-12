@@ -66,7 +66,7 @@
     creates: "{{remote_ca_path}}/server.csr"
 
 - set_fact:
-    ekara_docker_altname: DNS:localhost,IP:127.0.0.1,IP:{{ekara_docker_provider.private_ip}}
+    ekara_docker_altname: DNS:localhost,IP:127.0.0.1,IP:{{ekara.private_ip}}
 - name: Create server cnf file with private IP
   become: true
   copy:
@@ -75,16 +75,16 @@
       subjectAltName = {{ekara_docker_altname}}
     dest: "{{remote_ca_path}}/server-extfile.cnf"
     force: true
-  when: ekara_docker_provider.public_ip == ""
+  when: ekara.public_ip == ""
 - name: Create server cnf file with private/public IP
   become: true
   copy:
     content: |
       extendedKeyUsage = clientAuth,serverAuth
-      subjectAltName = {{ekara_docker_altname}},IP:{{ekara_docker_provider.public_ip}}
+      subjectAltName = {{ekara_docker_altname}},IP:{{ekara.public_ip}}
     dest: "{{remote_ca_path}}/server-extfile.cnf"
     force: false
-  when: ekara_docker_provider.public_ip != ""
+  when: ekara.public_ip != ""
 - name: Create Server certificate
   become: true
   command: >
