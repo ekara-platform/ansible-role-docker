@@ -1,10 +1,4 @@
 ---
-# defaults file for ekara.docker
-output_dir: /opt/output
-ekara_docker_proxy:
-ekara_docker_params:
-ekara_docker_ca_cn: docker
-ekara_provider_map:
-ekara_docker_all:
-ekara_docker_default_version: 18.06
-ekara_labels:
+ek_docker_ca_cn: ekara
+ek_docker_proxy: {}
+ek_docker_params: {}

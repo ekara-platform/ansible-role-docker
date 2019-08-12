@@ -1,9 +1,0 @@
----
-- name: Start docker
-  include_tasks: "{{ekara_machine_version}}"
-  tags: ansible
-  with_first_found:
-  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/daemon-start.yml"
-  - "{{ ansible_distribution | lower }}/daemon-start.yml"
-  loop_control:
-    loop_var: ekara_machine_version

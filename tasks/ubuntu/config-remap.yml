@@ -4,6 +4,7 @@
   group:
     name: dockremap
     state: present
+    
 - name: Create new user to remap root
   become: true
   user:
@@ -11,6 +12,7 @@
     comment: "User to remap docker"
     group: dockremap
     shell: /bin/false
+
 - name: Copy configuration for docker remap
   become: true
   copy:

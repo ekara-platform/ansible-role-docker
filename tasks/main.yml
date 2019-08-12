@@ -1,70 +1,31 @@
 ---
-# tasks file for ekara.docker
-- name: Install docker/ansible configuration
-  include_tasks: "{{ekara_machine_version}}"
-  tags: ansible
-  with_first_found:
-  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/docker-ansible.yml"
-  - "{{ ansible_distribution | lower }}/docker-ansible.yml"
-  loop_control:
-    loop_var: ekara_machine_version
+- name: Configure Docker service
+  include_tasks: config-service.yml
 
-- name: Add docker group
-  include_tasks: "{{ekara_machine_version}}"
-  tags: ansible
-  with_first_found:
-  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/docker-group.yml"
-  - "{{ ansible_distribution | lower }}/docker-group.yml"
-  loop_control:
-    loop_var: ekara_machine_version
+- name: Configure Docker TLS
+  when: ek_docker_params.tls.enabled | default(true)
+  include_tasks: config-tls.yml
 
-- name: Install docker
-  include_tasks: "{{ekara_machine_version}}"
-  tags: ansible
-  with_first_found:
-  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/install.yml"
-  - "{{ ansible_distribution | lower }}/install.yml"
-  loop_control:
-    loop_var: ekara_machine_version
+- name: Configure Docker proxy
+  when: ek_docker_proxy.http_proxy is defined and ek_docker_proxy.http_proxy != ""
+  include_tasks: config-proxy.yml
 
-- name: Add TLS for docker
-  include_tasks: "{{ekara_machine_version}}"
-  tags: ansible
-  with_first_found:
-  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/config-tls.yml"
-  - "{{ ansible_distribution | lower }}/config-tls.yml"
-  loop_control:
-    loop_var: ekara_machine_version
-  when: ekara_docker_params.tls is defined
-
-- name: Add Proxies for docker
-  include_tasks: proxies.yml
-  tags: ansible
-  when: ekara_docker_proxy.http_proxy is defined
-
-- name: Add Usernamespace for docker
-  include_tasks: "{{ekara_machine_version}}"
-  tags: ansible
-  with_first_found:
-  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release }}/config-user-ns.yml"
-  - "{{ ansible_distribution | lower }}/config-user-ns.yml"
-  loop_control:
-    loop_var: ekara_machine_version
-  when: ekara_docker_params['userns-remap'] is defined
+- name: Configure user namespace
+  when: ek_docker_params.remap | default(true)
+  include_tasks: config-remap.yml
 
 - name: Add private registry for docker
+  when: ek_docker_registries is defined
   include_tasks: registries.yml
-  tags: ansible
   loop_control:
-    loop_var: ekara_registry
-  loop: "{{(ekara_docker_all.registries|default({}))|dict2items}}"
-  when: ekara_docker_all.registries is defined
+    loop_var: ek_registry
+  loop: "{{ (ek_docker_registries | default({})) | dict2items }}"
 
-- name: Update configuration
-  include_tasks: update-json.yml
+- name: Configure Docker daemon
+  when: ek_docker_params.daemon is defined
+  include_tasks: config-daemon.yml
   vars:
-    docker_daemon_new_config: "{{ekara_docker_params}}"
+    ek_docker_daemon_config: "{{ ek_docker_params.daemon }}"
 
-- name: Start docker
-  include_tasks: start.yml
-  tags: ansible
+- name: Restart docker
+  include_tasks: restart.yml
