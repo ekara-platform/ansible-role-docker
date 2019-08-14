@@ -78,7 +78,7 @@
       subjectAltName = {{ ek_docker_altname }}
     dest: "{{ remote_ca_path }}/server-extfile.cnf"
     force: true
-  
+
 - name: Create server cnf file with private/public IP
   when: ekara.public_ip != ""
   become: true
