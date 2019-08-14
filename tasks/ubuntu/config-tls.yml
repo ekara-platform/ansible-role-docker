@@ -5,7 +5,7 @@
     local_ca_path: "{{ output_dir }}/certs"
 
 - name: Ensure certificate output directory exists on the Ansible controller
-  connection: local
+  delegate_to: localhost
   file:
     path: "{{ item }}"
     state: directory
@@ -14,13 +14,13 @@
   - "{{ local_ca_path }}"
 
 - name: Generate CA key on the Ansible controller
+  delegate_to: localhost
   command: openssl genrsa -out "{{ local_ca_path }}/ca-priv-key.pem" 4096
-  connection: local
   args:
     creates: "{{ local_ca_path }}/ca-priv-key.pem"
 
 - name: Create CA on the Ansible controller
-  connection: local
+  delegate_to: localhost
   command: >
     openssl req -new -x509 -days 3650
       -key "{{ local_ca_path }}/ca-priv-key.pem"
