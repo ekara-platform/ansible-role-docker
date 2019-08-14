@@ -1,0 +1,9 @@
+---
+- name: Ensure TLS is configured for Docker
+  include_tasks: "{{ ek_tasks_to_run }}"
+  with_first_found:
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release | lower }}/config-tls.yml"
+  - "{{ ansible_distribution | lower }}/config-tls.yml"
+  - "common/config-tls.yml"
+  loop_control:
+    loop_var: ek_tasks_to_run

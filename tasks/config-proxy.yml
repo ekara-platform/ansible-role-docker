@@ -1,0 +1,9 @@
+---
+- name: Ensure proxy is configured for Docker
+  include_tasks: "{{ ek_tasks_to_run }}"
+  with_first_found:
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release | lower }}/config-proxy.yml"
+  - "{{ ansible_distribution | lower }}/config-proxy.yml"
+  - "common/config-proxy.yml"
+  loop_control:
+    loop_var: ek_tasks_to_run

@@ -1,0 +1,9 @@
+---
+- name: Ensure Docker is remaped in a user namespace
+  include_tasks: "{{ ek_tasks_to_run }}"
+  with_first_found:
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release | lower }}/config-remap.yml"
+  - "{{ ansible_distribution | lower }}/config-remap.yml"
+  - "common/config-remap.yml"
+  loop_control:
+    loop_var: ek_tasks_to_run

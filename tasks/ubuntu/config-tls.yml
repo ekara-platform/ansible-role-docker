@@ -1,128 +1,119 @@
 ---
 - set_fact:
-    ca_cn: "{{ekara_docker_ca_cn}}"
-    remote_ca_path: "{{ ekara_docker_params.tlscacert | dirname }}"
-    local_ca_path: "{{output_dir}}/certs"
+    ca_cn: "{{ ek_docker_ca_cn }}"
+    remote_ca_path: "{{ ek_docker_params.tls.cacert | dirname }}"
+    local_ca_path: "{{ output_dir }}/certs"
 
-- name: Create ssl directory
+- name: Ensure certificate output directory exists on the Ansible controller
   connection: local
   file:
-    path: "{{item}}"
+    path: "{{ item }}"
     state: directory
     mode: 0770
   with_items:
-  - "{{local_ca_path}}"
+  - "{{ local_ca_path }}"
 
-- name: Create CA key
-  command: openssl genrsa -out "{{local_ca_path}}/ca-priv-key.pem" 4096
+- name: Generate CA key on the Ansible controller
+  command: openssl genrsa -out "{{ local_ca_path }}/ca-priv-key.pem" 4096
   connection: local
   args:
-    creates: "{{local_ca_path}}/ca-priv-key.pem"
+    creates: "{{ local_ca_path }}/ca-priv-key.pem"
 
-- name: Create CA
+- name: Create CA on the Ansible controller
   connection: local
   command: >
     openssl req -new -x509 -days 3650
-      -key "{{local_ca_path}}/ca-priv-key.pem"
-      -out "{{local_ca_path}}/{{ ekara_docker_params.tlscacert | basename }}"
-      -subj "/CN={{ca_cn}}/C=FR"
+      -key "{{ local_ca_path }}/ca-priv-key.pem"
+      -out "{{ local_ca_path }}/{{ ek_docker_params.tls.cacert | basename }}"
+      -subj "/CN={{ ek_docker_ca_cn }}/C=FR"
   args:
-    creates: "{{local_ca_path}}/{{ ekara_docker_params.tlscacert | basename }}"
+    creates: "{{ local_ca_path }}/{{ ek_docker_params.tls.cacert | basename }}"
 
-- name: Create ssl directory
+- name: Create Docker certificate directory
   become: true
   file:
-    path: "{{item}}"
+    path: "{{ item }}"
     state: directory
     mode: 0750
     group: docker
   with_items:
-  - "{{remote_ca_path}}"
+  - "{{ remote_ca_path }}"
 
-- name: Push CA certificate
+- name: Push CA certificate on the node
   become: true
   copy:
-    src: "{{local_ca_path}}/{{item}}"
-    dest: "{{remote_ca_path}}/{{item}}"
+    src: "{{ local_ca_path }}/{{ item }}"
+    dest: "{{ remote_ca_path }}/{{ item }}"
   with_items:
-  - "{{ ekara_docker_params.tlscacert | basename }}"
+  - "{{ ek_docker_params.tls.cacert | basename }}"
   - "ca-priv-key.pem"
 
 - name: Create server key
   become: true
   command: >
     openssl genrsa
-      -out "{{remote_ca_path}}/{{ ekara_docker_params.tlskey | basename }}"
+      -out "{{ remote_ca_path }}/{{ ek_docker_params.tls.key | basename }}"
       4096
   args:
-    creates: "{{remote_ca_path}}/{{ ekara_docker_params.tlskey | basename }}"
-- name: Create Server csr
+    creates: "{{ remote_ca_path }}/{{ ek_docker_params.tls.key | basename }}"
+
+- name: Create server CSR
   become: true
   command: >
-    openssl req -subj "/CN={{ca_cn}}" -new
-      -key "{{remote_ca_path}}/{{ ekara_docker_params.tlskey | basename }}"
-      -out "{{remote_ca_path}}/server.csr"
+    openssl req -subj "/CN={{ ca_cn }}" -new
+      -key "{{ remote_ca_path }}/{{ ek_docker_params.tls.key | basename }}"
+      -out "{{ remote_ca_path }}/server.csr"
   args:
-    creates: "{{remote_ca_path}}/server.csr"
+    creates: "{{ remote_ca_path }}/server.csr"
 
 - set_fact:
-    ekara_docker_altname: DNS:localhost,IP:127.0.0.1,IP:{{ekara.private_ip}}
+    ek_docker_altname: DNS:localhost,IP:127.0.0.1,IP:{{ ekara.private_ip }}
+
 - name: Create server cnf file with private IP
-  become: true
-  copy:
-    content: |
-      extendedKeyUsage = clientAuth,serverAuth
-      subjectAltName = {{ekara_docker_altname}}
-    dest: "{{remote_ca_path}}/server-extfile.cnf"
-    force: true
   when: ekara.public_ip == ""
-- name: Create server cnf file with private/public IP
   become: true
   copy:
     content: |
       extendedKeyUsage = clientAuth,serverAuth
-      subjectAltName = {{ekara_docker_altname}},IP:{{ekara.public_ip}}
-    dest: "{{remote_ca_path}}/server-extfile.cnf"
-    force: false
+      subjectAltName = {{ ek_docker_altname }}
+    dest: "{{ remote_ca_path }}/server-extfile.cnf"
+    force: true
+
+- name: Create server cnf file with private/public IP
   when: ekara.public_ip != ""
+  become: true
+  copy:
+    content: |
+      extendedKeyUsage = clientAuth,serverAuth
+      subjectAltName = {{ ek_docker_altname }},IP:{{ekara.public_ip}}
+    dest: "{{ remote_ca_path }}/server-extfile.cnf"
+    force: false
+
 - name: Create Server certificate
   become: true
   command: >
     openssl x509 -req -days 3650
-      -in "{{remote_ca_path}}/server.csr"
-      -CA "{{remote_ca_path}}/{{ ekara_docker_params.tlscacert | basename }}"
-      -CAkey "{{remote_ca_path}}/ca-priv-key.pem"
+      -in "{{ remote_ca_path }}/server.csr"
+      -CA "{{ remote_ca_path }}/{{ ek_docker_params.tls.cacert | basename }}"
+      -CAkey "{{ remote_ca_path }}/ca-priv-key.pem"
       -CAcreateserial
-      -out "{{remote_ca_path}}/{{ ekara_docker_params.tlscert | basename }}"
-      -extfile "{{remote_ca_path}}/server-extfile.cnf"
+      -out "{{ remote_ca_path }}/{{ ek_docker_params.tls.cert | basename }}"
+      -extfile "{{ remote_ca_path }}/server-extfile.cnf"
   args:
-    creates: "{{remote_ca_path}}/{{ ekara_docker_params.tlscert | basename }}"
+    creates: "{{ remote_ca_path }}/{{ ek_docker_params.tls.cert | basename }}"
 
 - name: Find certificates files
   become: true
   find:
-    paths: "{{remote_ca_path}}"
+    paths: "{{ remote_ca_path }}"
     patterns: "*.*"
-  register: files_to_change
+  register: ek_files_to_change
 
-- name: Modify the file permissions
+- name: Modify certificates file permissions
   become: true
   file:
     path: "{{ item.path }}"
     group: docker
     mode: 0640
-  with_items: "{{ files_to_change.files }}"
+  with_items: "{{ ek_files_to_change.files }}"
   no_log: true
-
-- name: Create docker directories
-  become: true
-  file: path="{{item}}" state=directory mode=0755
-  with_items:
-  - /etc/systemd/system/docker.service.d
-
-##### Custom config
-- name: Install custom configuration
-  become: true
-  copy:
-    src: files/docker.conf
-    dest: /etc/systemd/system/docker.service.d

@@ -1,0 +1,9 @@
+---
+- name: Restart docker
+  include_tasks: "{{ ek_tasks_to_run }}"
+  with_first_found:
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release | lower }}/restart.yml"
+  - "{{ ansible_distribution | lower }}/restart.yml"
+  - "common/restart.yml"
+  loop_control:
+    loop_var: ek_tasks_to_run
