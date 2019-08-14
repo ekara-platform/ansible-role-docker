@@ -16,12 +16,12 @@
 - name: Inject node labels into daemon configuration
   when: ek_docker_labels is defined
   set_fact:
-    ek_docker_daemon_config: "{{ ek_docker_daemon_config | combine({'labels': ek_docker_labels}) }}"
+    ek_docker_daemon_config: "{{ ek_docker_daemon_config | combine({'labels': ek_docker_labels}, recursive=True) }}"
 
 - name: Inject remap setting into daemon configuration
   when: ek_docker_params.remap | default(true)
   set_fact:
-    ek_docker_daemon_config: "{{ ek_docker_daemon_config | combine({'userns-remap': 'dockremap'}) }}"
+    ek_docker_daemon_config: "{{ ek_docker_daemon_config | combine({'userns-remap': 'dockremap'}, recursive=True) }}"
 
 - debug:
     var: ek_docker_daemon_config
