@@ -25,9 +25,9 @@
   when: ek_docker_params.daemon is defined
   include_tasks: config-daemon.yml
 
-- name: Add Ansible user to docker group 
+- name: Add Ansible user to docker group
   user:
-    name: {{ ansible_user_id }}
+    name: "{{ ansible_user_id }}"
     groups: docker
 
 - name: Restart docker
