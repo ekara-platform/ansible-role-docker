@@ -24,8 +24,6 @@
 - name: Configure Docker daemon
   when: ek_docker_params.daemon is defined
   include_tasks: config-daemon.yml
-  vars:
-    ek_docker_daemon_config: "{{ ek_docker_params.daemon }}"
 
 - name: Restart docker
   include_tasks: restart.yml
