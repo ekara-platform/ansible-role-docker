@@ -26,6 +26,7 @@
   include_tasks: config-daemon.yml
 
 - name: Add Ansible user to docker group
+  become: true
   user:
     name: "{{ ansible_user_id }}"
     groups: docker
