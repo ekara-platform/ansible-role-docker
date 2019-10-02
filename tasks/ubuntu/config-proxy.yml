@@ -1,6 +1,7 @@
 ---
 - name: Install proxy configuration file
   become: true
+  notify: restart docker
   template:
     src: templates/proxy.conf
     dest: /etc/systemd/system/docker.service.d

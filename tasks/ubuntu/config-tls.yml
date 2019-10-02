@@ -41,6 +41,7 @@
 
 - name: Push CA certificate on the node
   become: true
+  notify: restart docker
   copy:
     src: "{{ local_ca_path }}/{{ item }}"
     dest: "{{ remote_ca_path }}/{{ item }}"
@@ -50,6 +51,7 @@
 
 - name: Create server key
   become: true
+  notify: restart docker
   command: >
     openssl genrsa
       -out "{{ remote_ca_path }}/{{ ek_docker_params.tls.key | basename }}"
@@ -59,6 +61,7 @@
 
 - name: Create server CSR
   become: true
+  notify: restart docker
   command: >
     openssl req -subj "/CN={{ ca_cn }}" -new
       -key "{{ remote_ca_path }}/{{ ek_docker_params.tls.key | basename }}"
@@ -72,6 +75,7 @@
 - name: Create server cnf file with private IP
   when: ekara.public_ip == ""
   become: true
+  notify: restart docker
   copy:
     content: |
       extendedKeyUsage = clientAuth,serverAuth
@@ -82,6 +86,7 @@
 - name: Create server cnf file with private/public IP
   when: ekara.public_ip != ""
   become: true
+  notify: restart docker
   copy:
     content: |
       extendedKeyUsage = clientAuth,serverAuth
@@ -91,6 +96,7 @@
 
 - name: Create Server certificate
   become: true
+  notify: restart docker
   command: >
     openssl x509 -req -days 3650
       -in "{{ remote_ca_path }}/server.csr"
@@ -111,6 +117,7 @@
 
 - name: Modify certificates file permissions
   become: true
+  notify: restart docker
   file:
     path: "{{ item.path }}"
     group: docker

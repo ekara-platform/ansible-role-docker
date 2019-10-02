@@ -1,21 +1,9 @@
 ---
-- name: "Ensure certificate folder for registry {{ ek_registry.key }} exists"
-  become: true
-  file:
-    path: "/etc/docker/certs.d/{{ ekara_registry.key }}"
-    state: directory
-    mode: 0755
-
-- name: Install certificate for registry {{ ek_registry.key }}
-  become: true
-  get_url:
-    url: "{{ ek_registry.value.cert }}"
-    dest: "/etc/docker/certs.d/{{ ek_registry.key }}"
-    mode: 0400
-
-- name: Log into private registry
-  when: ek_registry.value.username is defined
-  docker_login:
-    registry: "{{ ek_registry.key }}"
-    username: "{{ ek_registry.value.username }}"
-    password: "{{ ek_registry.value.password }}"
+- name: "Ensure Docker registry {{ ek_registry.key }} is configured"
+  include_tasks: "{{ ek_tasks_to_run }}"
+  with_first_found:
+  - "{{ ansible_distribution | lower }}/{{ ansible_distribution_release | lower }}/config-registry.yml"
+  - "{{ ansible_distribution | lower }}/config-registry.yml"
+  - "common/config-registry.yml"
+  loop_control:
+    loop_var: ek_tasks_to_run

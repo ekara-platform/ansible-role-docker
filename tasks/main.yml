@@ -14,9 +14,9 @@
   when: ek_docker_params.remap | default(true)
   include_tasks: config-remap.yml
 
-- name: Add private registry for docker
+- name: Configure additional docker registries
   when: ek_docker_registries is defined
-  include_tasks: registries.yml
+  include_tasks: config-registry.yml
   loop_control:
     loop_var: ek_registry
   loop: "{{ (ek_docker_registries | default({})) | dict2items }}"
@@ -30,6 +30,3 @@
   user:
     name: "{{ ansible_user_id }}"
     groups: docker
-
-- name: Restart docker
-  include_tasks: restart.yml

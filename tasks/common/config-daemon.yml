@@ -1,0 +1,34 @@
+---
+- set_fact:
+    ek_docker_daemon_config: "{{ ek_docker_params.daemon | default({}) }}"
+
+- name: Ensure Docker directories exist
+  become: true
+  file: path="{{ item }}" state=directory mode=0755
+  with_items:
+  - /etc/docker
+
+- name: Extract node labels from inventory
+  loop: "{{ ekara.labels | dict2items }}"
+  set_fact:
+    ek_docker_labels: "{{ (ek_docker_labels | default([])) + [ item.key ~ '=' ~ item.value ] }}"
+
+- name: Inject node labels into daemon configuration
+  when: ek_docker_labels is defined
+  set_fact:
+    ek_docker_daemon_config: "{{ ek_docker_daemon_config | combine({'labels': ek_docker_labels}, recursive=True) }}"
+
+- name: Inject remap setting into daemon configuration
+  when: ek_docker_params.remap | default(true)
+  set_fact:
+    ek_docker_daemon_config: "{{ ek_docker_daemon_config | combine({'userns-remap': 'dockremap'}, recursive=True) }}"
+
+- debug:
+    var: ek_docker_daemon_config
+
+- name: Generate daemon.json on the node
+  become: true
+  notify: restart docker
+  copy:
+    content: "{{ ek_docker_daemon_config | to_nice_json }}"
+    dest: /etc/docker/daemon.json

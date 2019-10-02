@@ -1,12 +1,14 @@
 ---
 - name: Add dockremap group
   become: true
+  notify: restart docker
   group:
     name: dockremap
     state: present
 
 - name: Create new user to remap root
   become: true
+  notify: restart docker
   user:
     name: dockremap
     comment: "User to remap docker"
@@ -15,6 +17,7 @@
 
 - name: Copy configuration for docker remap
   become: true
+  notify: restart docker
   copy:
     src: "{{item}}"
     dest: /etc/
