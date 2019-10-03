@@ -1,4 +1,4 @@
 ---
 - name: Restarting Docker daemon due to changes
-  include_tasks: docker-restart.yml
+  import_tasks: docker-restart.yml
   listen: restart docker
