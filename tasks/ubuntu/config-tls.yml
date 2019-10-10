@@ -70,7 +70,8 @@
   args:
     creates: "{{ remote_ca_path }}/server.csr"
 
-- set_fact:
+- name: Compute docker alternate name
+  set_fact:
     ek_docker_altname: DNS:localhost,IP:127.0.0.1,IP:{{ ekara.private_ip }}
 
 - name: Create server cnf file with private IP
