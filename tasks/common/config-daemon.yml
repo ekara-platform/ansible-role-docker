@@ -24,6 +24,7 @@
     ek_docker_daemon_config: "{{ ek_docker_daemon_config | combine({'userns-remap': 'dockremap'}, recursive=True) }}"
 
 - debug:
+    verbosity: 1
     var: ek_docker_daemon_config
 
 - name: Generate daemon.json on the node
