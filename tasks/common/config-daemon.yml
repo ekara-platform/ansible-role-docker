@@ -1,5 +1,6 @@
 ---
-- set_fact:
+- name: Create initial daemon configuration
+  set_fact:
     ek_docker_daemon_config: "{{ ek_docker_params.daemon | default({}) }}"
 
 - name: Ensure Docker directories exist

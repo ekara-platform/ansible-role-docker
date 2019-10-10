@@ -1,5 +1,6 @@
 ---
-- set_fact:
+- name: Compute certificate paths
+  set_fact:
     ca_cn: "{{ ek_docker_ca_cn }}"
     remote_ca_path: "{{ ek_docker_params.tls.cacert | dirname }}"
     local_ca_path: "{{ output_dir }}/certs"
