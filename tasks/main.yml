@@ -20,12 +20,11 @@
   when: ek_docker_params.remap | default(true)
   include_tasks: config-remap.yml
 
-- name: Configure additional docker registries
-  when: ek_docker_params.registries is defined
-  include_tasks: config-registry.yml
+- name: Configure additional Docker registries
   loop_control:
     loop_var: ek_registry
-  loop: "{{ ek_docker_params.registries | dict2items }}"
+  loop: "{{ ek_docker_params.registries | default({}) | dict2items }}"
+  include_tasks: config-registry.yml
 
 - name: Configure Docker daemon
   when: ek_docker_params.daemon is defined
