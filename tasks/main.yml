@@ -1,5 +1,5 @@
 ---
-- name: Install system pacakges
+- name: Install system packages
   include_tasks: system.yml
 
 - name: Install PIP packages

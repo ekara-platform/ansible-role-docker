@@ -1,7 +1,7 @@
 ---
 - name: Ensure that preliminary dependencies are present
   become: true
-  environment: "{{ ek_proxy_env }}"
+  environment: "{{ ek_docker_proxy }}"
   apt:
     state: latest
     update_cache: true
@@ -12,21 +12,21 @@
 
 - name: Ensure Docker official GPG key is present
   become: true
-  environment: "{{ ek_proxy_env }}"
+  environment: "{{ ek_docker_proxy }}"
   apt_key:
     url: "https://download.docker.com/linux/ubuntu/gpg"
     state: present
 
 - name: Ensure Docker stable repository is configured
   become: true
-  environment: "{{ ek_proxy_env }}"
+  environment: "{{ ek_docker_proxy }}"
   apt_repository:
     repo: "deb https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
     state: present
 
 - name: Ensure that required dependencies are installed
   become: true
-  environment: "{{ ek_proxy_env }}"
+  environment: "{{ ek_docker_proxy }}"
   apt:
     state: latest
     update_cache: true
@@ -74,7 +74,7 @@
 
   - name: "Ensure Docker {{ ek_docker_versions[0] }} and compose are installed"
     become: true
-    environment: "{{ ek_proxy_env }}"
+    environment: "{{ ek_docker_proxy }}"
     apt:
       state: present
       update_cache: true
@@ -93,7 +93,7 @@
 - name: Ensure the latest available version of Docker and compose are installed
   when: ek_docker_version == 'latest'
   become: true
-  environment: "{{ ek_proxy_env }}"
+  environment: "{{ ek_docker_proxy }}"
   apt:
     state: latest
     update_cache: true

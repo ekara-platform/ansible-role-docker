@@ -1,7 +1,7 @@
 ---
 - name: Upgrade PIP
   become: true
-  environment: "{{ ek_proxy_env }}"
+  environment: "{{ ek_docker_proxy }}"
   pip:
     executable: pip3
     state: latest
@@ -16,7 +16,7 @@
 
 - name: Ensure that required PIP modules are installed
   become: true
-  environment: "{{ ek_proxy_env }}"
+  environment: "{{ ek_docker_proxy }}"
   pip:
     executable: pip3
     state: latest

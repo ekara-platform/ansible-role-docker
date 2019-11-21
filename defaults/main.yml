@@ -2,3 +2,4 @@
 ek_docker_ca_cn: ekara
 ek_docker_proxy: {}
 ek_docker_params: {}
+ek_docker_version: latest
