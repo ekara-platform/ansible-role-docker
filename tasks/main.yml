@@ -1,4 +1,10 @@
 ---
+- name: Install system pacakges
+  include_tasks: system.yml
+
+- name: Install PIP packages
+  include_tasks: pip.yml
+
 - name: Configure Docker service
   include_tasks: config-service.yml
 
@@ -15,11 +21,11 @@
   include_tasks: config-remap.yml
 
 - name: Configure additional docker registries
-  when: ek_docker_registries is defined
+  when: ek_docker_params.registries is defined
   include_tasks: config-registry.yml
   loop_control:
     loop_var: ek_registry
-  loop: "{{ (ek_docker_registries | default({})) | dict2items }}"
+  loop: "{{ ek_docker_params.registries | dict2items }}"
 
 - name: Configure Docker daemon
   when: ek_docker_params.daemon is defined

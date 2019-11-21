@@ -1,0 +1,26 @@
+---
+- name: Upgrade PIP
+  become: true
+  environment: "{{ ek_proxy_env }}"
+  pip:
+    executable: pip3
+    state: latest
+    name: pip
+
+- name: Ensure that outdated PIP module docker-py is absent
+  become: true
+  pip:
+    executable: pip3
+    state: absent
+    name: docker-py
+
+- name: Ensure that required PIP modules are installed
+  become: true
+  environment: "{{ ek_proxy_env }}"
+  pip:
+    executable: pip3
+    state: latest
+    name:
+    - docker
+    - docker-compose
+    - jsondiff
